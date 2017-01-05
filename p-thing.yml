@@ -4,6 +4,12 @@ resources:
   source:
     uri: https://github.com/mcarlson-sb/concourse-experiment.git
     branch: p-thing-ci
+- name: p-thing-source-master
+  type: git
+  source:
+    uri: git@github.com:mcarlson-sb/concourse-experiment.git
+    branch: p-thing-master
+    private_key: {{p-thing-write-key}}
 
 jobs:
 - name: test-p-thing
@@ -22,3 +28,15 @@ jobs:
         run:
           path: echo
           args: ["I have tested the p-thing, world!"]
+- name: promote-p-thing-to-master
+  build-logs-to-retain: 5
+  plan:
+  - timeout: 1m
+    do:
+    - get: p-thing-source-ci
+      trigger: true
+      passed: [test-p-thing]
+    - put: p-thing-source-master
+      params:
+        repository: p-thing-source-ci
+
