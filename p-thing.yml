@@ -11,6 +11,18 @@ resources:
     branch: p-thing-master
     private_key: {{p-thing-write-key}}
 
+- name: b-thing-source-ci
+  type: git
+  source:
+    uri: https://github.com/mcarlson-sb/concourse-experiment.git
+    branch: b-thing-ci
+- name: b-thing-source-master
+  type: git
+  source:
+    uri: git@github.com:mcarlson-sb/concourse-experiment.git
+    branch: b-thing-master
+    private_key: {{b-thing-write-key}}
+
 jobs:
 - name: test-p-thing
   build-logs-to-retain: 5
@@ -40,3 +52,30 @@ jobs:
       params:
         repository: p-thing-source-ci
 
+- name: test-b-thing
+  build-logs-to-retain: 5
+  plan:
+  - timeout: 1m
+    do:
+    - get: b-thing-source-ci
+      trigger: true
+    - task: test-b-thing
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source: {repository: ubuntu}
+        run:
+          path: echo
+          args: ["I have tested the b-thing, world!"]
+- name: promote-b-thing-to-master
+  build-logs-to-retain: 5
+  plan:
+  - timeout: 1m
+    do:
+    - get: b-thing-source-ci
+      trigger: true
+      passed: [test-b-thing]
+    - put: b-thing-source-master
+      params:
+        repository: b-thing-source-ci
