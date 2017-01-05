@@ -9,7 +9,7 @@ resources:
   source:
     uri: git@github.com:mcarlson-sb/concourse-experiment.git
     branch: p-thing-master
-    private_key: {{p-thing-write-key}}
+    private_key: {{thing-write-key}}
 
 - name: b-thing-source-ci
   type: git
