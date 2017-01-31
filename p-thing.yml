@@ -27,7 +27,7 @@ jobs:
           source: {repository: ubuntu}
         run:
           path: echo
-          args: ["I have tested the p-thing, world!"]
+          args: ["I have really tested the p-thing, world!"]
 - name: promote-p-thing-to-master
   build-logs-to-retain: 5
   plan:
